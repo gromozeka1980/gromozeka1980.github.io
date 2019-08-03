@@ -852,28 +852,28 @@ window.onload = function() {
 		if(!playerMoving){
 			switch(e.keyCode){
 				// left
-				case 37:
+				case 39:
 					//player.animations.play('left');
 					move(-1,0);
 					//player.animations.stop();
 					//player.frame = 144;
 					break;
 				// up
-				case 38:
+				case 40:
 				    //player.animations.play('up');
 					move(0,-1);
 					//player.animations.stop();
 					//player.frame = 176;
 					break;
 				// right
-				case 39:
+				case 37:
 				    //player.animations.play('right');
 					move(1,0);
 					//player.animations.stop();
 					//player.frame = 160;
 					break;
 				// down
-				case 40:
+				case 38:
 				    //player.animations.play('down');
 					move(0,1);
 					//player.animations.stop();
