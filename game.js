@@ -1043,16 +1043,16 @@ window.onload = function() {
         else {
             	switch(path[start]){
 					case 'u':
-					    move(0,-1);
-					    break;
-					case 'd':
 					    move(0,1);
 					    break;
+					case 'd':
+					    move(0,-1);
+					    break;
 					case 'l':
-					    move(-1,0);
+					    move(1,0);
 					    break;
 					case 'r':
-					    move(1,0);
+					    move(-1,0);
 					    break;
 				}
 		movePlayerPath(path,start+1);
