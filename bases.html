@@ -1,0 +1,225 @@
+<html>
+
+<style>
+.pow {
+  display: inline-block;
+  width: 100px;
+  height: 64px;
+  background: gray;
+  font-size: 20px;
+  text-align: center;
+  position: relative;
+ }
+.pow2 {
+  display: inline-block;
+  width: 100px;
+  height: 64px;
+  background: gray;
+  font-size: 16px;
+  text-align: center;
+  position: relative;
+ } 
+.selector {
+  display: inline-block;
+  width: 100px;
+  height: 64px;
+  background: blue;
+  font-size: 20px;
+  text-align: center;
+  position: relative;
+ }
+.res {
+  display: inline-block;
+  font-size: 25px;
+  text-align: center;
+  position: relative;
+ }
+
+
+</style>
+
+<head>
+  
+</head>
+
+<body>
+<span id="select_prompt">Select the base:</span><select id="base_select"> </select>
+
+<table>
+
+<tr id="powers">
+</tr>
+
+<tr id="powers2">
+</tr>
+
+<tr id="values">
+</tr>
+
+</table>
+<span id="calc_result" class="res"></span>
+<br><br><br><br>
+
+<span id="select_prompt2">Select the base:</span><select id="base_select2"> </select>
+
+
+<table>
+
+<tr id="values2">
+</tr>
+
+</table>
+
+<span id="calc_result2" class="res"></span>
+
+
+
+
+
+
+
+
+
+
+<script>
+window.onload = fill_table;
+
+digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+function fill_table() {
+  var base_select = document.getElementById("base_select");
+  var base_select2 = document.getElementById("base_select2");
+
+  base_select.onchange = change_base;
+  base_select2.onchange = change_digit2;
+
+  for (var i=2; i<37;i++){
+  	base_select.innerHTML+='<option value='+i+'>'+i+'</option>';
+    base_select2.innerHTML+='<option value='+i+'>'+i+'</option>';
+  }
+  populate_tables();
+}
+
+
+
+function populate_table(){
+	var powers = document.getElementById("powers");
+	var powers2 = document.getElementById("powers2");
+  var values = document.getElementById("values");
+
+  res = document.getElementById('calc_result');
+  res.innerHTML = '';
+
+
+	powers.innerHTML = "";
+	powers2.innerHTML = "";
+	values.innerHTML = "";
+	base = base_select.value;
+
+
+	for (var i = 0; i < 8; i++) {
+  		//powers.innerHTML+='<td><span class="pow">' + base+"<sup>"+(7-i) + '</sup>='+Math.pow(base,7-i)+'</span></td>';
+  		powers.innerHTML+='<td><span class="pow">' + base+"<sup>"+(7-i) + '</sup></span></td>';
+  		powers2.innerHTML+='<td><span class="pow2">' +Math.pow(base,7-i)+'</span></td>';
+  		values.innerHTML+='<td><select class="selector" id=value'+(7-i)+'>   </select></td>';
+  		cur_value = document.getElementById('value'+(7-i));
+  		//cur_value.onchange = change_digit;   //uncomment this
+  		
+  		for (var j =0; j<base; j++) {
+  			cur_value.innerHTML += '<option value='+j+'>'+digits[j]+'</option>';
+  		}
+  	}
+
+  	for (var i=0;i<8;i++){     //comment this
+  		cur_value = document.getElementById('value'+(7-i)); //and this
+  		cur_value.onchange = change_digit; //and this
+  	} //and this
+
+}
+
+
+function populate_table2(){
+
+  for (var i = 0; i < 8; i++) {
+      values2.innerHTML+='<td><select class="selector" id=value2_'+(7-i)+'>   </select></td>';
+      cur_value2 = document.getElementById('value2_'+(7-i));
+      
+      for (var j =0; j<10; j++) {
+        cur_value2.innerHTML += '<option value='+j+'>'+digits[j]+'</option>';
+      }
+    }
+
+    for (var i=0;i<8;i++){     //comment this
+      cur_value2 = document.getElementById('value2_'+(7-i));
+      cur_value2.onchange = change_digit2;
+    } //and this
+}
+
+function populate_tables(){
+  populate_table();
+  populate_table2();
+}
+
+
+function change_base(){
+	var prompt = document.getElementById("select_prompt");
+	var base_select = document.getElementById("base_select");
+	populate_table();
+}
+
+
+
+function change_digit2(){
+  number = 0;
+  num_in_base = "";
+  base = base_select2.value;
+  for (var i=0;i<8;i++){
+    cur_value = document.getElementById('value2_'+(7-i));
+    number = number*10+parseInt(cur_value.value);
+  }
+  res = document.getElementById('calc_result2');
+  res.innerHTML = "";
+  backup_number=number;
+  while(number!=0){
+    div = Math.floor(number/base);
+    rem = number % base;
+    st=(number+"/"+base+"="+div+" remainder "+rem);
+    if (rem > 9){
+      st+=("("+digits[rem]+")")
+    }
+    res.innerHTML+=st+"<br>"
+    num_in_base=digits[rem]+num_in_base;
+    number = div;
+  }
+  res.innerHTML+=backup_number+'='+num_in_base+"<sub>"+base+"</sub>"
+}
+
+
+function change_digit(){
+	base = base_select.value;
+	st = '';
+	result = 0;
+	number_in_base = '';
+	first_significant = false;
+	for (var i =0;i<8;i++){
+		cur_value = document.getElementById('value'+(7-i));
+		if (cur_value.value != 0) {
+			first_significant = true;
+			if (st!='') st+= "+";
+			st += cur_value.value + '*'+ Math.pow(base,(7-i));
+			result += cur_value.value * Math.pow(base,(7-i));
+		}
+		if (first_significant) number_in_base+=digits[cur_value.value];
+	}
+	res = document.getElementById('calc_result');
+	res.innerHTML = '';
+	if (st!='') {
+		st = number_in_base+'<sub>'+base+'</sub>=' + st;
+		res.innerHTML = st+"="+result;
+	}
+}
+
+</script>
+
+</body>
+</html>
