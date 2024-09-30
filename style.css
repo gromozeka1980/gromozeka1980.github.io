@@ -1,0 +1,50 @@
+/* style.css */
+
+/* Adjust the container to occupy full width */
+.container-fluid {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/* Center align the text in the table */
+table.dataTable th,
+table.dataTable td {
+    text-align: center;
+}
+
+/* Styling the success and danger rows */
+.table-success {
+    background-color: #d4edda;
+}
+
+.table-danger {
+    background-color: #f8d7da;
+}
+
+/* Ensure the table is displayed properly */
+table.dataTable {
+    width: 100% !important;
+}
+
+/* Text wrapping to prevent horizontal scroll */
+.text-wrap {
+    white-space: normal;
+}
+
+/* Style for the notes button */
+.account-note-btn {
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+/* Fix column header alignment */
+table.dataTable thead th {
+    vertical-align: middle;
+}
+
+/* Adjust font size for certain columns */
+table.dataTable td:nth-child(3),
+table.dataTable td:nth-child(6) {
+    font-size: 0.9rem;
+}
+

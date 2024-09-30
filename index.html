@@ -1,17 +1,160 @@
 <!DOCTYPE html>
-<html>
-	<head>
-	<style type="text/css">
-		body{
-			background: #000000;
-			padding:0px;
-			margin:0px;
-		}
-	</style>
-	<script src="phaser.min.js"></script>
-	<script src="easystar-0.3.0.min.js"></script>
-     <script src = "game.js"></script>
-	</head>
-	<body>
-	</body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PMS Transaction Classifier</title>
+    <!-- Include Bootstrap, DataTables CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container-fluid mt-4">
+    <h2 class="text-center">PMS Transaction Classifier</h2>
+    <form id="filterForm" class="form-inline justify-content-center mt-4">
+        <div class="form-group mx-sm-3">
+            <label for="threshold" class="mr-2">Threshold:</label>
+            <input type="number" class="form-control" id="threshold" step="0.01" value="0.7">
+        </div>
+        <div class="form-group mx-sm-3">
+            <label for="minAmount" class="mr-2">Min Amount:</label>
+            <input type="number" class="form-control" id="minAmount" step="0.01" value="350">
+        </div>
+        <div class="form-group mx-sm-3">
+            <input type="file" class="form-control-file" id="csvFile">
+        </div>
+        <button type="submit" class="btn btn-primary mx-sm-3">Classify</button>
+        <button type="button" id="showStatsBtn" class="btn btn-secondary mx-sm-3" disabled>Statistics</button>
+        <button type="button" id="exportBtn" class="btn btn-success mx-sm-3" disabled>Export Notes</button>
+    </form>
+
+    <div id="resultsSection" class="mt-4" style="display:none;">
+        <table id="resultsTable" class="table table-striped table-bordered" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Account No</th>
+                    <th>PMS</th>
+                    <th>Top PMS Transaction</th>
+                    <th>Amount</th>
+                    <th>Transaction Date</th>
+                    <th>Categories</th>
+                    <th>Binary Confidence</th>
+                    <th>PMS Type</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Transaction Details Modal -->
+<!-- Transaction Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" style="max-width:95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Transaction Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-target="#detailsModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Form inside Modal -->
+                <form id="modalFilterForm" class="form-inline mb-3">
+                    <div class="form-group mx-sm-3">
+                        <label for="modalThreshold" class="mr-2">Threshold:</label>
+                        <input type="number" class="form-control" id="modalThreshold" step="0.01">
+                    </div>
+                    <div class="form-group mx-sm-3">
+                        <label for="modalMinAmount" class="mr-2">Min Amount:</label>
+                        <input type="number" class="form-control" id="modalMinAmount" step="0.01">
+                    </div>
+                    <button type="submit" class="btn btn-primary mx-sm-3">Filter</button>
+                </form>
+                <table id="detailsTable" class="table table-striped table-bordered" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>PMS</th>
+                            <th>Transaction Name</th>
+                            <th>Categories</th>
+                            <th>Amount</th>
+                            <th>Transaction Date</th>
+                            <th>Binary Confidence</th>
+                            <th>PMS Type</th>
+                            <!-- Removed PMS Confidence header -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <!-- Removed Statistics button -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#detailsModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Note</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-target="#noteModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteTextArea" class="form-control" rows="10"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="saveNoteBtn" class="btn btn-primary">Save Note</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#noteModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Modal -->
+<div class="modal fade" id="statsModal" tabindex="-1" aria-labelledby="statsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" style="max-width:95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Statistics</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-target="#statsModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Statistics content will be inserted here by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-target="#statsModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include JavaScript libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<!-- Papa Parse -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<!-- Include your custom script -->
+<script src="script.js"></script>
+
+</body>
 </html>
+
