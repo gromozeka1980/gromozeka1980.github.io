@@ -201,7 +201,8 @@ function displayResults() {
             $(row).attr('data-account-id', data.account_id);
         },
         responsive: true,
-        autoWidth: false
+        autoWidth: false,
+        pageLength: 100
     });
 
     // Update event handlers
@@ -287,7 +288,8 @@ function showDetails(accountId) {
             },
             responsive: true,
             autoWidth: false,
-            destroy: true // Ensure old DataTable is properly destroyed
+            destroy: true, // Ensure old DataTable is properly destroyed
+            pageLength: 100
         });
     }
 
